@@ -95,6 +95,18 @@ access Django directories, this can lead to unsightly errors. Here again the sec
 
 ```
 
+### php
+PHP is used as the CGI interface. I deployed another docker image which will use django and gunicorn as wsgi, maybe you want to have a look at that repository, too. The PHP installation uses the bitnami php image and exposes the volume /var/www/html to the same directory the web server uses.
+
+```
+    php:
+        image: bitnami/php-fpm
+        container_name: php_mallowz_php
+        restart: always
+        volumes:
+            - "./web:/var/www/html"
+```
+
 ### pypMyAdmin
 As mentioned above, the pypMyAdmin instance is only for more convenient maintenance of the database. Instead of having to log in to the container and enter console commands, 
 I allowed myself the luxury of accessing the database via a web interface. The official Docker Hub image of phpmyadmin is used, which usually makes the service 
