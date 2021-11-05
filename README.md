@@ -151,3 +151,46 @@ variables in advance or to use secrects.
             MYSQL_USER: mallowz
             MYSQL_PASSWORD: mallowz
 ```
+
+# Nginx configuration
+I also faced some challenges with nginx. For example, I had to figure out that a config file needs to be created in the first place. However, after I had implemented the basic configuration of the web server correctly, the Django installation would not start. After some experimentation, I came up with this solution:
+
+```
+# Nginx configuration
+
+server {
+    listen 80 default_server;
+    server_name localhost
+
+    index index.php index.html;
+    error_log  /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log;
+    root /var/www/html;
+   
+    set $virtualdir "";
+    set $realdir "";
+
+    location / {
+        try_files $uri $uri/ $realdir/index.php?$args;
+    }
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass php:9000;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+}
+```
+
+The file is - as specified in the dockercompose file - to be saved in the directory "etc/nginx/default.conf"
+
+# Project installation and configuration
+
+1. Open up command prompt
+2. Create a new project folder and cd into it
+3. Create etc/nginx folder and place default.conf inside it
+4. Execute a "docker-compose up -d"
+5. Open up the browser and navigate to "localhost:8000". You should see the nginx start page.
