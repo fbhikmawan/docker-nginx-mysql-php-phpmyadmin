@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+    web:
+        image: nginx:alpine
+        container_name: webserver_mallowz_php
+        restart: always
+        ports:
+            - 8000:80     
+        volumes:
+            - "./web:/var/www/html"
+            - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
+        depends_on:
+            - database
+            - php
+
+    php:
+        image: bitnami/php-fpm
+        container_name: php_mallowz_php
+        restart: always
+        volumes:
+            - "./web:/var/www/html"
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin_mallowz_php
+        restart: always
+        ports:
+            - 8080:80
+        environment: 
+            PMA_HOST: mysql_mallowz_php
+            PMA_ARBITRARY: 1
+            MYSQL_ROOT_PASSWORD: "root"
+        depends_on:
+            - database
+
+    database:
+        image: mysql:5.7.22
+        container_name: mysql_mallowz_php
+        restart: always
+        ports:
+            - 8081:3306
+        volumes:
+            - ./data/db/mysql:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: mallowz
+            MYSQL_USER: mallowz
+            MYSQL_PASSWORD: mallowz
